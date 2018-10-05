@@ -1,0 +1,11 @@
+*.iml
+target
+.idea
+*.log
+_generated_productDef.json
+.classpath
+.project
+.settings
+.version.txt
+.ApiService_IT_Config
+
