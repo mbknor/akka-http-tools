@@ -1,17 +1,44 @@
 import ReleaseTransformations._
+import sbt.{Credentials, Path}
 import sbtrelease.ReleasePlugin.autoImport.releaseStepCommand
 
-enablePlugins(PackPlugin)
 
 lazy val commonSettings = Seq(
   organization := "com.kjetland.akka-http-tools",
-  organizationName := "kjetland.com",
-  scalaVersion := "2.12.6",
+  organizationName := "mbknor",
+  scalaVersion := "2.12.7",
+  crossScalaVersions := Seq("2.12.7"),
+  publishMavenStyle := true,
+  publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (isSnapshot.value)
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  },
+  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials_sonatype"),
+  homepage := Some(url("https://github.com/mbknor/akka-http-tools")),
+  licenses := Seq("MIT" -> url("https://github.com/mbknor/akka-http-tools/blob/master/LICENSE.txt")),
+  startYear := Some(2018),
+  pomExtra := (
+    <scm>
+      <url>git@github.com:mbknor/akka-http-tools.git</url>
+      <connection>scm:git:git@github.com:mbknor/akka-http-tools.git</connection>
+    </scm>
+      <developers>
+        <developer>
+          <id>mbknor</id>
+          <name>Morten Kjetland</name>
+          <url>https://github.com/mbknor</url>
+        </developer>
+      </developers>),
   compileOrder in Test := CompileOrder.Mixed,
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
   scalacOptions ++= Seq("-unchecked", "-deprecation"),
-  releaseCrossBuild := false,
+  releaseCrossBuild := true,
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   scalacOptions in(Compile, doc) ++= Seq(scalaVersion.value).flatMap {
     case v if v.startsWith("2.12") =>
       Seq("-no-java-comments") //workaround for scala/scala-dev#249
@@ -66,18 +93,6 @@ lazy val jacksonDeps = Seq(
   "com.fasterxml.jackson.module" %%  "jackson-module-scala" % jacksonVersion % "provided"
 )
 
-lazy val deps  = Seq(
-
-  "com.github.swagger-akka-http" %%  "swagger-akka-http" % swaggerAkkaHttpVersion,
-  "io.kamon" %%  "kamon-core" % "1.1.3",
-  "io.kamon" %%  "kamon-logback" % "1.0.3",
-  "io.kamon" %%  "kamon-akka-2.5" % "1.1.2",
-  "io.kamon" %%  "kamon-prometheus" % "1.1.1",
-  "io.kamon" %%  "kamon-akka-http-2.5" % "1.1.0",
-  "org.aspectj" %  "aspectjweaver" % "1.9.1",
-  "junit"             %  "junit"       % "4.12"  % "test"
-)
-
 lazy val root = (project in file("."))
   .settings(name := "akka-http-tools-parent")
   .settings(commonSettings: _*)
@@ -106,5 +121,12 @@ releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   inquireVersions,
   runTest,
-  tagRelease
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  publishArtifacts,
+  setNextVersion,
+  commitNextVersion,
+  pushChanges,
+  releaseStepCommand("sonatypeRelease")
 )
