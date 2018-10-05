@@ -40,10 +40,10 @@ lazy val commonDeps = Seq(
 )
 
 lazy val akkaDeps = Seq(
-  "com.typesafe.akka" %%  "akka-actor" % akkaVersion % "provided",
+  "com.typesafe.akka" %%  "akka-actor" % akkaVersion,
   "com.typesafe.akka" %%  "akka-slf4j" % akkaVersion % "provided",
   "com.typesafe.akka" %%  "akka-stream" % akkaVersion % "provided",
-  "com.typesafe.akka" %%  "akka-http" % akkaHttpVersion % "provided",
+  "com.typesafe.akka" %%  "akka-http" % akkaHttpVersion,
   "com.typesafe.akka" %%  "akka-http-caching" % akkaHttpVersion % "provided",
   "com.typesafe.akka" %%  "akka-testkit" % akkaVersion % "test",
   "com.typesafe.akka" %%  "akka-stream-testkit" % akkaVersion % "test",
@@ -68,7 +68,6 @@ lazy val jacksonDeps = Seq(
 
 lazy val deps  = Seq(
 
-  "ch.megard" %%  "akka-http-cors" % "0.3.0",
   "com.github.swagger-akka-http" %%  "swagger-akka-http" % swaggerAkkaHttpVersion,
   "io.kamon" %%  "kamon-core" % "1.1.3",
   "io.kamon" %%  "kamon-logback" % "1.0.3",
@@ -92,6 +91,7 @@ lazy val akkaHttpToolsCore = (project in file("akka-http-tools-core"))
   .settings(libraryDependencies ++= (commonDeps))
   .settings(libraryDependencies ++= (akkaDeps))
   .settings(libraryDependencies ++= (jacksonDeps))
+  .settings(libraryDependencies ++= (Seq("ch.megard" %%  "akka-http-cors" % "0.3.0")))
 
 lazy val akkaHttpToolsJwt = (project in file("akka-http-tools-jwt"))
   .settings(name := "akka-http-tools-jwt")
