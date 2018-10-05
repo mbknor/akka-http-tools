@@ -32,6 +32,7 @@ val scalaTestVersion = "3.0.4"
 
 
 lazy val commonDeps = Seq(
+  "com.google.guava" %  "guava" % "25.1-jre",
   "com.typesafe.scala-logging" %%  "scala-logging" % scalaLoggingVersion,
   "org.scalatest" %%  "scalatest" % scalaTestVersion % "test",
   "org.mockito" %  "mockito-core" % "2.18.3" % "test",
@@ -75,7 +76,6 @@ lazy val deps  = Seq(
   "io.kamon" %%  "kamon-prometheus" % "1.1.1",
   "io.kamon" %%  "kamon-akka-http-2.5" % "1.1.0",
   "org.aspectj" %  "aspectjweaver" % "1.9.1",
-  "com.google.guava" %  "guava" % "25.1-jre",
   "junit"             %  "junit"       % "4.12"  % "test"
 )
 
