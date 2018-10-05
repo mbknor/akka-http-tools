@@ -26,8 +26,8 @@ abstract class RestClientHelper
 
   implicit val mat:ActorMaterializer = ActorMaterializer()
 
-  val requestLog:Logger
-  val responseLog:Logger
+  val requestLog: Logger = Logger(getClass.getName + ".request")
+  val responseLog: Logger = Logger(getClass.getName + ".response")
 
   private val breakerDecideIfFailure: Try[_] ⇒ Boolean = {
     case _: Success[_] ⇒ false

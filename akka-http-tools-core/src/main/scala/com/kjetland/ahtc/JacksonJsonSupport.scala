@@ -13,14 +13,14 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 
 trait JacksonJsonSupport {
-  val mapper:ObjectMapper
+  val objectMapper:ObjectMapper
 
   // Override this to produce custom version
   val marshallAsContentType:ContentType = `application/json`.withParams(Map("charset" -> "utf-8"))
 
   implicit def JacksonMarshaller: ToEntityMarshaller[AnyRef] = {
     Marshaller.withFixedContentType(marshallAsContentType) { obj =>
-      HttpEntity(marshallAsContentType, mapper.writeValueAsString(obj).getBytes("UTF-8"))
+      HttpEntity(marshallAsContentType, objectMapper.writeValueAsString(obj).getBytes("UTF-8"))
     }
   }
 
@@ -28,7 +28,7 @@ trait JacksonJsonSupport {
     new FromEntityUnmarshaller[T] {
       override def apply(entity: HttpEntity)(implicit ec: ExecutionContext, materializer: Materializer): Future[T] = {
         entity.toStrict(5 seconds).map(_.data.decodeString("UTF-8")).map { str =>
-          mapper.readValue(str, c.runtimeClass).asInstanceOf[T]
+          objectMapper.readValue(str, c.runtimeClass).asInstanceOf[T]
         }
       }
     }
@@ -40,11 +40,11 @@ trait JacksonJsonSupport {
 
     def ctag = implicitly[reflect.ClassTag[T]]
     val clazz = ctag.runtimeClass.asInstanceOf[Class[T]]
-    val tree = mapper.readTree(json).asInstanceOf[ArrayNode]
+    val tree = objectMapper.readTree(json).asInstanceOf[ArrayNode]
 
     var list = List[T]()
     tree.elements().asScala.foreach { e =>
-      list = list :+ mapper.treeToValue(e, clazz)
+      list = list :+ objectMapper.treeToValue(e, clazz)
     }
 
     list
