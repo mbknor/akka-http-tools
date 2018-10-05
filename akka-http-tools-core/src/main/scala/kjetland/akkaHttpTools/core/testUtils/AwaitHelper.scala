@@ -1,4 +1,4 @@
-package com.kjetland.ahtc.testUtils
+package kjetland.akkaHttpTools.core.testUtils
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}

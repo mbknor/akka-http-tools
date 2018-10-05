@@ -1,14 +1,14 @@
-package com.kjetland.ahtc.restclient
+package kjetland.akkaHttpTools.core.restClient
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpEntity.Chunked
+import akka.http.scaladsl.model.StatusCodes.{NotFound, OK}
 import akka.http.scaladsl.model._
 import akka.pattern.CircuitBreaker
 import akka.stream.{ActorMaterializer, BufferOverflowException}
-import com.kjetland.ahtc._
 import com.typesafe.scalalogging.Logger
-import akka.http.scaladsl.model.StatusCodes.{NotFound, OK}
+import kjetland.akkaHttpTools.core._
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -41,7 +41,7 @@ abstract class RestClientHelper
           // akka.http.host-connection-pool.max-open-requests
           false
 
-        case e:AhtException =>
+        case e:HttpErrorExceptionLike =>
           e.circuitBreakerError
         case _ =>
           // default as error

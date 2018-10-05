@@ -1,7 +1,7 @@
-package com.kjetland.ahtc.restclient
+package kjetland.akkaHttpTools.core.restClient
 
 import akka.actor.ActorSystem
-import com.kjetland.ahtc.calllimiter.CallLimiterPercentageImpl
+import kjetland.akkaHttpTools.core.callLimiter.CallLimiterPercentageImpl
 
 import scala.concurrent.ExecutionContext
 

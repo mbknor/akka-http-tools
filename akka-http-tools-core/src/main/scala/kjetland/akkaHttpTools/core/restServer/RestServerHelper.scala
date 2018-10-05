@@ -1,11 +1,11 @@
-package com.kjetland.ahtc.restserver
+package kjetland.akkaHttpTools.core.restServer
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server._
+import akka.http.scaladsl.server.Directives.{handleExceptions, handleRejections, rejectEmptyResponse}
+import akka.http.scaladsl.server.{RejectionHandler, Route}
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives.{cors, corsRejectionHandler}
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
-import com.kjetland.ahtc.JacksonJsonSupport
-import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import kjetland.akkaHttpTools.core.JacksonJsonSupport
 
 trait RestServerHelper extends JacksonJsonSupport with ExceptionToHttpError {
 

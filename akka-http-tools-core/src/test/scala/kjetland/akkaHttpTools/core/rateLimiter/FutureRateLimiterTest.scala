@@ -1,11 +1,11 @@
-package com.kjetland.ahtc.rateLimiter
+package kjetland.akkaHttpTools.core.rateLimiter
 
 import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.ActorSystem
 import akka.pattern.AskTimeoutException
 import akka.testkit.TestKitBase
-import com.kjetland.ahtc.testUtils.AwaitHelper
+import kjetland.akkaHttpTools.core.testUtils.AwaitHelper
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Future

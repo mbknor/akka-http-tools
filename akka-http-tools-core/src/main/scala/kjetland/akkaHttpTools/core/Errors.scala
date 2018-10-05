@@ -1,9 +1,9 @@
-package com.kjetland.ahtc
+package kjetland.akkaHttpTools.core
 
 import akka.http.scaladsl.model.{ContentType, ContentTypes, StatusCode, StatusCodes}
 
 // AkkaHttpToolsException
-trait AhtException {
+trait HttpErrorExceptionLike {
   def httpStatusCode:StatusCode
   def httpErrorBody:String
   val httpContentType:ContentType.NonBinary = ContentTypes.`text/plain(UTF-8)`
@@ -17,7 +17,7 @@ object HttpErrorException {
 }
 
 class HttpErrorException(statusCode:StatusCode, body:String, customDescription:Option[String] = None)
-  extends RuntimeException(customDescription.getOrElse(s"HTTP-ERROR ${statusCode.intValue()}: $body")) with AhtException {
+  extends RuntimeException(customDescription.getOrElse(s"HTTP-ERROR ${statusCode.intValue()}: $body")) with HttpErrorExceptionLike {
   override def httpStatusCode: StatusCode = statusCode
   override def httpErrorBody: String = body
 
@@ -29,13 +29,13 @@ class HttpErrorException(statusCode:StatusCode, body:String, customDescription:O
 class CustomHttpErrorException(_statusCode:StatusCode, _msg:String) extends HttpErrorException(_statusCode, _msg, Some(_msg))
 
 
-case class UnauthorizedException(msg:String) extends RuntimeException(msg) with AhtException {
+case class UnauthorizedException(msg:String) extends RuntimeException(msg) with HttpErrorExceptionLike {
   override def httpStatusCode: StatusCode = StatusCodes.Unauthorized
   override def httpErrorBody: String = toString
   override def circuitBreakerError: Boolean = false
 }
 
-case class ForbiddenException() extends RuntimeException with AhtException {
+case class ForbiddenException() extends RuntimeException with HttpErrorExceptionLike {
   override def httpStatusCode: StatusCode = StatusCodes.Forbidden
   override def httpErrorBody: String = "Forbidden"
   override def circuitBreakerError: Boolean = false

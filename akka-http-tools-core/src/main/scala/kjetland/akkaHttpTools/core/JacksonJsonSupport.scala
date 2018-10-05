@@ -1,14 +1,13 @@
-package com.kjetland.ahtc
+package kjetland.akkaHttpTools.core
 
 import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
-import akka.http.scaladsl.model.{ContentType, HttpEntity}
 import akka.http.scaladsl.model.MediaTypes.`application/json`
+import akka.http.scaladsl.model.{ContentType, HttpEntity}
 import akka.http.scaladsl.unmarshalling.FromEntityUnmarshaller
 import akka.stream.Materializer
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import scala.concurrent.duration._
-
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 
@@ -50,4 +49,3 @@ trait JacksonJsonSupport {
     list
   }
 }
-

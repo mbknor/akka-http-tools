@@ -1,7 +1,6 @@
-package com.kjetland.ahtc
+package kjetland.akkaHttpTools.core
 
 import com.typesafe.scalalogging.Logger
-
 
 trait Logging {
 

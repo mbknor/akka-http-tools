@@ -1,11 +1,11 @@
-package com.kjetland.ahtc.restserver
+package kjetland.akkaHttpTools.core.restServer
 
 import akka.http.scaladsl.model.{HttpEntity, HttpResponse, StatusCodes, Uri}
 import akka.http.scaladsl.server.Directives.{complete, extractUri}
 import akka.http.scaladsl.server.ExceptionHandler
 import akka.pattern.CircuitBreakerOpenException
-import com.kjetland.ahtc.{AhtException, Logging}
 import com.typesafe.scalalogging.Logger
+import kjetland.akkaHttpTools.core.HttpErrorExceptionLike
 
 import scala.concurrent.TimeoutException
 
@@ -49,7 +49,7 @@ trait ExceptionToHttpError {
           complete(HttpResponse(StatusCodes.ServiceUnavailable, entity = errorMsg) )
         }
 
-      case x: AhtException =>
+      case x: HttpErrorExceptionLike =>
         extractUri { uri =>
           logErrorRequest(uri, x.httpStatusCode.intValue(), x.toString)
           complete(HttpResponse(x.httpStatusCode, entity = HttpEntity(x.httpContentType, x.httpErrorBody)))

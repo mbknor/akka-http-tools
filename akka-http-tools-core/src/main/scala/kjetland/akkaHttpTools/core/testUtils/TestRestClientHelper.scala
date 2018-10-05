@@ -1,4 +1,4 @@
-package com.kjetland.ahtc.testUtils
+package kjetland.akkaHttpTools.core.testUtils
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http

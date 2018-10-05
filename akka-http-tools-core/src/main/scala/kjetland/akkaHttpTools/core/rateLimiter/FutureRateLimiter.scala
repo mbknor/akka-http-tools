@@ -1,10 +1,10 @@
-package com.kjetland.ahtc.rateLimiter
+package kjetland.akkaHttpTools.core.rateLimiter
 
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
-import com.kjetland.ahtc.Logging
+import kjetland.akkaHttpTools.core.Logging
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration

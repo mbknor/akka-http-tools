@@ -1,10 +1,10 @@
-package com.kjetland.ahtc.calllimiter
+package kjetland.akkaHttpTools.core.callLimiter
 
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.IntUnaryOperator
 
 import akka.http.scaladsl.model.{StatusCode, StatusCodes}
-import com.kjetland.ahtc.{AhtException, Logging}
+import kjetland.akkaHttpTools.core.{HttpErrorExceptionLike, Logging}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -12,7 +12,7 @@ trait CallLimiter {
   def execute[T](f: => Future[T]): Future[T]
 }
 
-case class CallLimiterOverloadedException(description:String) extends RuntimeException(description) with AhtException {
+case class CallLimiterOverloadedException(description:String) extends RuntimeException(description) with HttpErrorExceptionLike {
   override def httpStatusCode: StatusCode = StatusCodes.ServiceUnavailable
   override def httpErrorBody: String = s"This part of the api is temporary overloaded: $description"
   override def circuitBreakerError: Boolean = false
