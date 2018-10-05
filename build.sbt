@@ -44,7 +44,8 @@ lazy val commonSettings = Seq(
       Seq("-no-java-comments") //workaround for scala/scala-dev#249
     case _ =>
       Seq()
-  }
+  },
+  sonatypeProfileName := "com.kjetland"
 )
 
 
