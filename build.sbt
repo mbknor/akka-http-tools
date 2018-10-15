@@ -99,6 +99,7 @@ lazy val root = (project in file("."))
   .settings(commonSettings: _*)
   .aggregate(
     akkaHttpToolsCore,
+    akkaHttpToolsJwt,
     )
 
 lazy val akkaHttpToolsCore = (project in file("akka-http-tools-core"))
@@ -112,6 +113,7 @@ lazy val akkaHttpToolsCore = (project in file("akka-http-tools-core"))
 lazy val akkaHttpToolsJwt = (project in file("akka-http-tools-jwt"))
   .settings(name := "akka-http-tools-jwt")
   .settings(commonSettings: _*)
+  .dependsOn(akkaHttpToolsCore)
   .settings(libraryDependencies ++= (commonDeps))
   .settings(libraryDependencies ++= (akkaDeps))
   .settings(libraryDependencies ++= (jwtDeps))
