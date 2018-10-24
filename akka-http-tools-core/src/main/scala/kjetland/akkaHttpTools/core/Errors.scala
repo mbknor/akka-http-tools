@@ -31,12 +31,12 @@ class CustomHttpErrorException(_statusCode:StatusCode, _msg:String) extends Http
 
 case class UnauthorizedException(msg:String) extends RuntimeException(msg) with HttpErrorExceptionLike {
   override def httpStatusCode: StatusCode = StatusCodes.Unauthorized
-  override def httpErrorBody: String = toString
+  override def httpErrorBody: String = msg
   override def circuitBreakerError: Boolean = false
 }
 
-case class ForbiddenException() extends RuntimeException with HttpErrorExceptionLike {
+case class ForbiddenException(msg:String = "Forbidden") extends RuntimeException(msg) with HttpErrorExceptionLike {
   override def httpStatusCode: StatusCode = StatusCodes.Forbidden
-  override def httpErrorBody: String = "Forbidden"
+  override def httpErrorBody: String = msg
   override def circuitBreakerError: Boolean = false
 }

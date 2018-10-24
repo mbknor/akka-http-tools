@@ -1,5 +1,7 @@
 package kjetland.akkaHttpTools.jwt
 
+import kjetland.akkaHttpTools.core.ForbiddenException
+
 /*
  {
   "iss": "https://kjetland.eu.auth0.com/",
@@ -21,5 +23,21 @@ case class JwtClaims
   exp:Int,
   azp:String,
   scope:Set[String],
-  gty:String
-)
+  gty:String,
+  allClaims:Map[String, Set[String]]
+) {
+
+  def getClaim(name:String):Set[String] = {
+    allClaims.getOrElse(name, Set())
+  }
+
+  @throws[ForbiddenException]
+  def assertClaimValue(name:String, value:String):Unit = {
+    if (!getClaim(name).contains(value)) {
+      throw ForbiddenException(s"Claim '$name'=='$value' missing")
+    }
+  }
+
+
+
+}

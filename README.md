@@ -6,3 +6,19 @@ akka-http-tools
 
 Contains a set of utilities useful when implementing REST-applications
 using akka-http
+
+
+
+--------
+How to modify auth0 rule to include permissions when using *Authorization extention*
+-------
+
+
+    // Custom 
+    const namespace = 'https://yourdomain.com/claims/';
+    context.idToken[namespace + 'groups'] = data.groups;
+    context.idToken[namespace + 'roles'] = data.roles;
+    context.idToken[namespace + 'permissions'] = data.permissions;
+
+
+

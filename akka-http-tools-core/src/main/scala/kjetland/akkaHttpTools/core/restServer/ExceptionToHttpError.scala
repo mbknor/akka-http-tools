@@ -1,11 +1,11 @@
 package kjetland.akkaHttpTools.core.restServer
 
 import akka.http.scaladsl.model.{HttpEntity, HttpResponse, StatusCodes, Uri}
-import akka.http.scaladsl.server.Directives.{complete, extractUri}
+import akka.http.scaladsl.server.Directives.{complete, extractUri, deleteCookie}
 import akka.http.scaladsl.server.ExceptionHandler
 import akka.pattern.CircuitBreakerOpenException
 import com.typesafe.scalalogging.Logger
-import kjetland.akkaHttpTools.core.HttpErrorExceptionLike
+import kjetland.akkaHttpTools.core.{HttpErrorExceptionLike, UnauthorizedException}
 
 import scala.concurrent.TimeoutException
 
@@ -15,18 +15,13 @@ trait ExceptionToHttpError {
 
   def logAllExceptions:Boolean = true
 
-  // To improve logging, we would like to extract userId from url,
-  // either from path, or from queryParam
-  def extractUserIdFromUri(uri:Uri):Option[Long]
+  // Override to include extra info when logging error-requests
+  def infoStringFroRequest(uri:Uri):Option[String] = None
 
   def logErrorRequest(uri:Uri, httpErrorCode:Int, errorMsg:String, exception:Option[Exception] = None): Unit = {
     if (logAllExceptions) {
 
-      val userIdString:String = extractUserIdFromUri(uri).map { userId =>
-        s"userId: $userId "
-      }.getOrElse("")
-
-      val logMsg = s"request failed ${userIdString}url=${uri.toString()} httpCode: $httpErrorCode error: $errorMsg"
+      val logMsg = s"request failed ${infoStringFroRequest(uri).map(s => s + " ")}url=${uri.toString()} httpCode: $httpErrorCode error: $errorMsg"
       exception match {
         case Some(e) => log.error(logMsg, e)
         case None    => log.info(logMsg)
@@ -48,6 +43,15 @@ trait ExceptionToHttpError {
           logErrorRequest(uri, StatusCodes.ServiceUnavailable.intValue, x.toString)
           complete(HttpResponse(StatusCodes.ServiceUnavailable, entity = errorMsg) )
         }
+
+      case x: UnauthorizedException =>
+        extractUri { uri =>
+          logErrorRequest(uri, x.httpStatusCode.intValue(), x.toString)
+          deleteCookie("authorization") { // Cookie used by kjetland.akkaHttpTools.weblogin.WebLoginSupport
+            complete(HttpResponse(x.httpStatusCode, entity = HttpEntity(x.httpContentType, x.httpErrorBody)))
+          }
+        }
+
 
       case x: HttpErrorExceptionLike =>
         extractUri { uri =>

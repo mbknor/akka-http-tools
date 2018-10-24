@@ -2,13 +2,15 @@ package kjetland.akkaHttpTools.jwt
 
 import java.util.concurrent.Executors
 
-import com.auth0.jwk.JwkProviderBuilder
+import com.auth0.jwk.{JwkException, JwkProviderBuilder}
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken._
-import kjetland.akkaHttpTools.core.Logging
+import kjetland.akkaHttpTools.core.{Logging, UnauthorizedException}
 import kjetland.akkaHttpTools.jwt.internal.PublicKeyResolver
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.collection.JavaConverters._
+import java.lang.{Iterable => JIterable, Integer => JInt, Long => JLong, Double => JDouble}
 
 class JwtDecoderImpl
 (
@@ -35,25 +37,46 @@ class JwtDecoderImpl
     }
 
     Future {
-      log.debug(s"decodeAndVerify encodedJwtToken: $encodedJwtToken")
-      // Strange java to scala workaround
-      val jwt:Jwt[JwsHeader[_], Claims] = jwtParser.parseClaimsJws(encodedJwtToken).asInstanceOf[Jwt[JwsHeader[_], Claims]]
-      val claims:Claims = jwt.getBody
+      try {
+        log.debug(s"decodeAndVerify encodedJwtToken: $encodedJwtToken")
+        // Strange java to scala workaround
+        val jwt: Jwt[JwsHeader[_], Claims] = jwtParser.parseClaimsJws(encodedJwtToken).asInstanceOf[Jwt[JwsHeader[_], Claims]]
+        val claims: Claims = jwt.getBody
 
-      val jwtClaims = JwtClaims(
-        iss = claims.get("iss", classOf[String]),
-        sub = claims.get("sub", classOf[String]),
-        aud = claims.get("aud", classOf[String]),
-        iat = claims.get("iat", classOf[Integer]).toInt,
-        exp = claims.get("exp", classOf[Integer]).toInt,
-        azp = claims.get("azp", classOf[String]),
-        scope = claims.get("scope", classOf[String]).split(' ').toSet,
-        gty = claims.get("gty", classOf[String]),
-      )
+        val allClaims:Map[String, Set[String]] = claims.keySet().asScala.map { key =>
+          val values:Set[String] = claims.get(key) match {
+            case s:String => Set(s)
+            case l:JIterable[_] => l.asScala.map(_.toString).toSet
+            case x:Any => Set(x.toString)
+          }
 
-      log.debug(s"decodeAndVerify encodedJwtToken: $encodedJwtToken - result: jwtClaims: $jwtClaims")
+          key -> values
 
-      jwtClaims
+        }.toMap
+
+        val jwtClaims = JwtClaims(
+          iss = claims.get("iss", classOf[String]),
+          sub = claims.get("sub", classOf[String]),
+          aud = claims.get("aud", classOf[String]),
+          iat = claims.get("iat", classOf[Integer]).toInt,
+          exp = claims.get("exp", classOf[Integer]).toInt,
+          azp = claims.get("azp", classOf[String]),
+          scope = Option(claims.get("scope", classOf[String])).map(_.split(' ').toSet).getOrElse(Set()),
+          gty = claims.get("gty", classOf[String]),
+          allClaims = allClaims
+        )
+
+        log.debug(s"decodeAndVerify encodedJwtToken: $encodedJwtToken - result: jwtClaims: $jwtClaims")
+
+        jwtClaims
+      } catch {
+        case e:JwtException =>
+          log.warn("Failed to decodeAndVerify jwtToken: " + e.toString, e)
+          throw UnauthorizedException("Not authorized")
+        case e:JwkException =>
+          log.warn("Failed to decodeAndVerify jwtToken: " + e.toString, e)
+          throw UnauthorizedException("Not authorized")
+      }
     }(blockingEC)
   }
 }
