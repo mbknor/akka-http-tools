@@ -70,13 +70,29 @@ class JwtDecoderImpl
 
         jwtClaims
       } catch {
+        case e:Exception =>
+          // Must unwrap
+          if ( e.getCause != null ) {
+            e.getCause match {
+              case e: JwtException =>
+                throw createUnauthorizedException(e)
+              case e: JwkException =>
+                throw createUnauthorizedException(e)
+              case _ => throw e
+            }
+          } else {
+            throw e
+          }
         case e:JwtException =>
-          log.warn("Failed to decodeAndVerify jwtToken: " + e.toString, e)
-          throw UnauthorizedException("Not authorized")
+          throw createUnauthorizedException(e)
         case e:JwkException =>
-          log.warn("Failed to decodeAndVerify jwtToken: " + e.toString, e)
-          throw UnauthorizedException("Not authorized")
+          throw createUnauthorizedException(e)
       }
     }(blockingEC)
+  }
+
+  private def createUnauthorizedException(e:Exception):Exception = {
+    log.warn("Failed to decodeAndVerify jwtToken: " + e.toString, e)
+    UnauthorizedException("Not authorized")
   }
 }
