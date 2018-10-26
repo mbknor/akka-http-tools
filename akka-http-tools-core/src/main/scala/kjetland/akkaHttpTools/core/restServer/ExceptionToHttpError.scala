@@ -21,7 +21,7 @@ trait ExceptionToHttpError {
   def logErrorRequest(uri:Uri, httpErrorCode:Int, errorMsg:String, exception:Option[Exception] = None): Unit = {
     if (logAllExceptions) {
 
-      val logMsg = s"request failed ${infoStringFroRequest(uri).map(s => s + " ")}url=${uri.toString()} httpCode: $httpErrorCode error: $errorMsg"
+      val logMsg = s"request failed ${infoStringFroRequest(uri).map(s => s + " ").getOrElse("")}url=${uri.toString()} httpCode: $httpErrorCode error: $errorMsg"
       exception match {
         case Some(e) => log.error(logMsg, e)
         case None    => log.info(logMsg)
