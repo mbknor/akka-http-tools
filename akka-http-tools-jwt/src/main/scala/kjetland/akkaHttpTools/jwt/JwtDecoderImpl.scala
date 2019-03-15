@@ -15,6 +15,7 @@ import java.lang.{Iterable => JIterable, Integer => JInt, Long => JLong, Double 
 class JwtDecoderImpl
 (
   jwkProviderUrl:String, // https://kjetland.eu.auth0.com
+  jwtAudience:String,
   objectMapper:ObjectMapper
 ) extends JwtDecoder with Logging {
 
@@ -67,6 +68,11 @@ class JwtDecoderImpl
         )
 
         log.debug(s"decodeAndVerify encodedJwtToken: $encodedJwtToken - result: jwtClaims: $jwtClaims")
+
+        if ( jwtClaims.aud != jwtAudience) {
+          log.warn(s"decodeAndVerify audience is not $jwtAudience - jwtClaims: $jwtClaims")
+          throw UnauthorizedException("Not authorized")
+        }
 
         jwtClaims
       } catch {
