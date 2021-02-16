@@ -6,8 +6,8 @@ import sbtrelease.ReleasePlugin.autoImport.releaseStepCommand
 lazy val commonSettings = Seq(
   organization := "com.kjetland.akka-http-tools",
   organizationName := "mbknor",
-  scalaVersion := "2.12.7",
-  crossScalaVersions := Seq("2.12.7"),
+  scalaVersion := "2.12.13",
+  crossScalaVersions := Seq("2.12.13"),
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
@@ -49,18 +49,16 @@ lazy val commonSettings = Seq(
 )
 
 
-val metricsVersion = "3.2.5"
-val akkaVersion = "2.5.15"
-val akkaHttpVersion = "10.1.5"
+val akkaVersion = "2.5.32"
+val akkaHttpVersion = "10.1.13"
 val swaggerAkkaHttpVersion = "0.14.0"
-val akkaToolsVersion = "2.5.0.1-SNAPSHOT"
-val jacksonVersion = "2.9.4"
-val scalaLoggingVersion = "3.9.0"
+val jacksonVersion = "2.9.9"
+val scalaLoggingVersion = "3.9.2"
 val scalaTestVersion = "3.0.4"
 
 
 lazy val commonDeps = Seq(
-  "com.google.guava" %  "guava" % "25.1-jre",
+  "com.google.guava" %  "guava" % "30.1-jre",
   "com.typesafe.scala-logging" %%  "scala-logging" % scalaLoggingVersion,
   "org.scalatest" %%  "scalatest" % scalaTestVersion % "test",
   "org.mockito" %  "mockito-core" % "2.18.3" % "test",
