@@ -130,6 +130,7 @@ abstract class RestClientHelper
             entityHandler.apply(res.entity)
               .map(Option(_))
           case NotFound =>
+            res.discardEntityBytes()
             Future.successful(None)
           case _ =>
             errorHandler(res)
