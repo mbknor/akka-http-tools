@@ -3,7 +3,7 @@ package kjetland.akkaHttpTools.core.restClient
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpEntity.Chunked
-import akka.http.scaladsl.model.StatusCodes.{NotFound, OK}
+import akka.http.scaladsl.model.StatusCodes.{MovedPermanently, NotFound, OK, PermanentRedirect, TemporaryRedirect}
 import akka.http.scaladsl.model._
 import akka.pattern.CircuitBreaker
 import akka.stream.{ActorMaterializer, BufferOverflowException}
@@ -84,7 +84,7 @@ abstract class RestClientHelper
     }
   }
 
-  def doRequest[T](request: HttpRequest)(entityHandler: ResponseEntity => Future[T]): Future[T] = {
+  def doRequest[T](request: HttpRequest, redirectCount: Int = 0)(entityHandler: ResponseEntity => Future[T]): Future[T] = {
 
 
     requestLog.debug("request: " + request)
@@ -100,6 +100,22 @@ abstract class RestClientHelper
         res.status match {
           case OK =>
             entityHandler.apply(res.entity)
+          case (TemporaryRedirect | PermanentRedirect | MovedPermanently ) =>
+            res.headers.find(_.name() == "Location").map(_.value()) match {
+              case None => errorHandler(res)
+              case Some(newUrl) =>
+                requestLog.debug(s"Following redirect to: $newUrl")
+                if ( redirectCount > 5) {
+                  requestLog.error("Too many redirects")
+                  errorHandler(res)
+                } else {
+                  val newRequest = request.copy(
+                    uri = Uri(newUrl)
+                  )
+                  doRequest(newRequest, redirectCount + 1)(entityHandler)
+                }
+            }
+
           case _ =>
             errorHandler(res)
         }
